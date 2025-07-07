@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom"; // Import BrowserRouter
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -13,9 +13,9 @@ import "./App.css";
 function App() {
   return (
     <div className="simple-idea-website bg-dark text-white">
-      <Header />
-      <main style={{ paddingTop: "80px" }}>
-        <BrowserRouter basename="/simple-idea">
+      <BrowserRouter basename="/simple-idea">
+        <Header />
+        <main style={{ paddingTop: "80px" }}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
@@ -23,9 +23,9 @@ function App() {
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/contact" element={<Contact />} />
           </Routes>
-        </BrowserRouter>
-      </main>
-      <Footer />
+        </main>
+        <Footer />
+      </BrowserRouter>
     </div>
   );
 }
