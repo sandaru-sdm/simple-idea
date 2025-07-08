@@ -1,5 +1,7 @@
+// src/components/Portfolio.jsx
+
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Button, Modal } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Modal, Carousel } from "react-bootstrap";
 import { portfolioItems } from "../data/data";
 
 function Portfolio() {
@@ -10,12 +12,29 @@ function Portfolio() {
     const [showModal, setShowModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
 
-    const portfolioCategories = ["All", "Branding", "Digital Printing", "Web Design", "Logo Design", "Leaflet Design", "Poster Design"];
+    // Helper to generate additional placeholder images for modal
+    const generateModalImages = (baseImage, count = 3) => {
+        const images = [baseImage]; // Always include the primary image
+        for (let i = 0; i < count; i++) {
+            // Generate a slightly different placeholder for each additional image
+            // Using a unique ID based on the current time and a random number
+            images.push(`https://picsum.photos/id/${Math.floor(Math.random() * 1000) + 100}/${1200}/${800}`);
+        }
+        return images;
+    };
+
+
+    const portfolioCategories = [
+        "All",
+        ...new Set(portfolioItems.map((item) => item.category)),
+    ];
 
     // Handlers for modal
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = (item) => {
-        setSelectedItem(item);
+        // When opening the modal, generate the full list of images for the carousel
+        const fullImages = generateModalImages(item.image);
+        setSelectedItem({ ...item, images: fullImages }); // Add the 'images' array to the selected item
         setShowModal(true);
     };
 
@@ -31,7 +50,7 @@ function Portfolio() {
 
     return (
         <>
-            <section className="py-5 bg-dark">
+            <section id="portfolio" className="py-5 bg-dark">
                 <Container>
                     <h2 className="display-5 text-center mb-5 text-white">Our Portfolio</h2>
                     <p className="lead text-center mb-5 text-white-50">
@@ -40,11 +59,13 @@ function Portfolio() {
                     </p>
 
                     <div className="portfolio-filters text-center mb-5">
-                        {portfolioCategories.map(category => (
+                        {portfolioCategories.map((category) => (
                             <Button
                                 key={category}
                                 variant="outline-primary"
-                                className={`me-2 mb-2 ${filter === category ? "active" : ""}`}
+                                className={`me-2 mb-2 ${
+                                    filter === category ? "active" : ""
+                                }`}
                                 onClick={() => setFilter(category)}
                             >
                                 {category}
@@ -52,7 +73,6 @@ function Portfolio() {
                         ))}
                     </div>
 
-                    {/* --- CHANGE: Added justify-content-center to center the cards --- */}
                     <Row className="g-4 justify-content-center">
                         {filteredItems.map((item) => (
                             <Col key={item.id} lg={4} md={6} className="mb-4">
@@ -63,7 +83,7 @@ function Portfolio() {
                                     >
                                         <Card.Img
                                             variant="top"
-                                            src={item.image}
+                                            src={item.image} // Still using item.image for the thumbnail
                                             alt={item.title}
                                             style={{
                                                 height: "100%",
@@ -76,7 +96,11 @@ function Portfolio() {
                                             <div className="overlay-content text-center p-3">
                                                 <h4 className="mb-2">{item.title}</h4>
                                                 <p className="mb-3">{item.category}</p>
-                                                <Button variant="outline-light" size="sm" onClick={() => handleShowModal(item)}>
+                                                <Button
+                                                    variant="outline-light"
+                                                    size="sm"
+                                                    onClick={() => handleShowModal(item)}
+                                                >
                                                     View Details
                                                 </Button>
                                             </div>
@@ -95,24 +119,34 @@ function Portfolio() {
                 </Container>
             </section>
 
-            {/* --- CHANGE: Removed size="lg" to make the modal smaller (default size) --- */}
+            {/* Portfolio Item Modal */}
             {selectedItem && (
-                <Modal show={showModal} onHide={handleCloseModal} centered data-bs-theme="dark">
+                <Modal show={showModal} onHide={handleCloseModal} centered size="xl" data-bs-theme="dark">
                     <Modal.Header closeButton>
                         <Modal.Title>{selectedItem.title}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Card.Img
-                            src={selectedItem.image}
-                            alt={selectedItem.title}
-                            className="img-fluid mb-4"
-                        />
-                        <h5 className="text-primary">{selectedItem.category}</h5>
-                        <p className="lead">
-                            This is a placeholder for a more detailed project description. You can discuss the client's requirements, the project's challenges, and the creative solutions you provided.
-                        </p>
+                        {/* Bootstrap Carousel for multiple images */}
+                        <Carousel interval={null} slide={false} data-bs-theme="dark">
+                            {/* Now selectedItem.images will contain the base image + generated placeholders */}
+                            {selectedItem.images.map((imgSrc, index) => (
+                                <Carousel.Item key={index}>
+                                    <img
+                                        className="d-block w-100"
+                                        src={imgSrc}
+                                        alt={`${selectedItem.title} Image ${index + 1}`}
+                                        style={{ maxHeight: '600px', objectFit: 'contain' }}
+                                    />
+                                </Carousel.Item>
+                            ))}
+                        </Carousel>
+
+                        <h5 className="text-primary mt-4">{selectedItem.category}</h5>
+                        <p className="lead">{selectedItem.description}</p>
                         <p>
-                            Highlighting key features, the technology stack (for web projects), and the positive outcomes or client feedback would be a great addition here.
+                            This section can be expanded with more specific details about the project's goals,
+                            challenges faced, and the solutions implemented. Showcasing client testimonials
+                            or quantifiable results (e.g., "Increased sales by X%") would enhance this description.
                         </p>
                     </Modal.Body>
                     <Modal.Footer>
