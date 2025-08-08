@@ -8,6 +8,7 @@ A full-service graphic design studio dedicated to transforming your vision into 
 ## Table of Contents
 
 - [Features](#features)
+- [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
